@@ -1,0 +1,27 @@
+import whisper
+import math
+
+model = whisper.load_model("base")
+result = model.transcribe("/Users/ryandepalma/Desktop/DCDS/vid/FOR-MST_0023_0_1_1_SOLO.mp4.mp4")
+
+interval = 10  # seconds per chunk
+chunks = {}
+
+# Group segments into intervals
+for segment in result["segments"]:
+    start = segment['start']
+    end = segment['end']
+    text = segment['text'].strip()
+    
+    # Determine which interval(s) this segment belongs to
+    start_bucket = math.floor(start / interval) * interval
+    end_bucket = math.floor(end / interval) * interval
+    
+    for bucket in range(int(start_bucket), int(end_bucket) + interval, interval):
+        if bucket not in chunks:
+            chunks[bucket] = ""
+        chunks[bucket] += " " + text
+
+# Print custom interval transcript
+for bucket in sorted(chunks.keys()):
+    print(f"[{bucket:.2f}s - {bucket + interval:.2f}s] {chunks[bucket].strip()}")
