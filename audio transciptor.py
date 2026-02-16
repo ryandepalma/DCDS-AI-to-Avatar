@@ -2,12 +2,13 @@ import whisper
 import librosa
 import numpy as np
 import math
+import csv
 
 # ===== USER CONFIG ===== #
 video_path = "/Users/ryandepalma/Desktop/DCDS/vid/FOR-MST_0023_0_1_1_SOLO.mp4.mp4"   # replace with path
 interval = 10       # set your custom interval in seconds
 model_name = "base"                    # options: tiny, base, small, medium, large
-output_file = "FOR-MST_0023_0_1_1_SOLO.txt"  # make sure to change file name for output
+output_file = "FOR-MST_0023_0_1_1_SOLO.csv"  # make sure to change file name for output
         # don't forget to include .txt ^
 # ===== SUMMARY OF LOGIC ===== #
 # 1. Whisper → get transcript with segments and timestamps
@@ -57,14 +58,34 @@ for segment in result["segments"]:
         segment_rms = rms[(times >= start) & (times <= end)]
         chunks[bucket]["volumes"].extend(segment_rms)
 
-# Write to output file
+# ===== WRITE CSV OUTPUT (Single Timestamp Column) ===== #
 print(f"Saving transcript with volume info to {output_file}...")
-with open(output_file, "w") as f:
+
+def format_timestamp(seconds):
+    minutes = int(seconds // 60)
+    secs = seconds % 60
+    return f"{minutes:02d}:{secs:05.2f}"  # e.g., "01:23.45"
+
+with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
+    writer = csv.writer(csvfile)
+    
+    # header row
+    writer.writerow(["timestamp", "avg_volume", "text"])
+    
     for bucket in sorted(chunks.keys()):
         avg_volume = float(np.mean(chunks[bucket]["volumes"])) if chunks[bucket]["volumes"] else 0
-        line = f"[{bucket:.2f}s - {bucket + interval:.2f}s] Volume: {avg_volume:.4f} | Text: {chunks[bucket]['text'].strip()}\n"
-        f.write(line)
-        print(line.strip())
+        
+        start_str = format_timestamp(bucket)
+        end_str = format_timestamp(bucket + interval)
+
+        timestamp = f"{start_str} - {end_str}"
+
+        writer.writerow([
+            timestamp,
+            f"{avg_volume:.4f}",
+            chunks[bucket]["text"].strip()
+        ])
 
 print("Done!")
+
 
