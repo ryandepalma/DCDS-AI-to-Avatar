@@ -86,7 +86,7 @@ def calc_db_per_second(file_path, save_csv = False, csv_name= None):
     return db_per_second
 
 if __name__ == "__main__":
-    calc_db_per_second("/Users/laura/Documents/DSSF/audio/VAN-EDU_SCOUN_0006_10_5_3_SOLO.mp3",
+    calc_db_per_second("audio/NU-COUN_0033_2_2_3_SOLO.mp3",
     save_csv = True)
 
 
