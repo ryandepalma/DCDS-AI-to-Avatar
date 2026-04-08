@@ -1,3 +1,4 @@
+#Laura Ozoria
 import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
@@ -7,7 +8,7 @@ import csv
 import os
 
 # paths
-video_path = "C:/Users/laura/Documents/DSSF/DCDS-AI-to-Avatar/videos/SC-MSW_0019_B_1_1_SOLO.mp4.mp4"
+video_path = "30vids/VAN-EDU_SCOUN_0006_B_1_1_SOLO.mp4" 
 model_path = "C:/Users/laura/Documents/DSSF/DCDS-AI-to-Avatar/pose_landmarker_full.task"
 csv_path   = f"C:/Users/laura/Documents/DSSF/DCDS-AI-to-Avatar/{os.path.splitext(os.path.basename(video_path))[0]}_landmarks.csv"
 
