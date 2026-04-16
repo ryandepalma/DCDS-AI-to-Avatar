@@ -51,39 +51,3 @@ The pipeline generates:
 Ryan DePalma
 Laura Ozoria Minaya
 Zoey Zeng
-
-## Pipeline Diagram
-This diagram shows the full multimodal pipeline used in this project.
-           ┌──────────────────────┐
-           │      Input Video     │
-           └─────────┬────────────┘
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-        ▼                         ▼
-┌───────────────┐       ┌────────────────┐
-│ Extract Audio │       │ Extract Frames │
-│ (moviepy)     │       │ (OpenCV)       │
-└──────┬────────┘       └──────┬─────────┘
-       │                       │
-       ▼                       ▼
-┌───────────────┐     ┌────────────────────┐
-│ Transcription │     │ Pose Detection     │
-│ (Whisper)     │     │ (MediaPipe)        │
-└──────┬────────┘     └─────────┬──────────┘
-       │                        │
-       ▼                        ▼
-┌────────────────┐     ┌────────────────────┐
-│ Audio Features │     │ Landmark Data      │
-│ (volume, pitch)│     │ (body movement)    │
-│ (librosa)      │     └─────────┬──────────┘
-└──────┬─────────┘               │
-       │                         │
-       └────────────┬────────────┘
-                    ▼
-      ┌──────────────────────────┐
-      │ Combined Dataset Output  │
-      │ (CSV / Excel)            │
-      └────────────---───────────┘
-```
-
