@@ -1,4 +1,8 @@
-#Laura Ozoria
+"""
+Laura Ozoria
+Processes a video and extracts pose landmarks (joints movement data), saving them into a CSV file.
+Run before any other file
+"""
 import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
@@ -8,7 +12,12 @@ import csv
 import os
 
 # paths
-video_path = "30vids/VAN-EDU_SCOUN_0006_B_1_1_SOLO.mp4" 
+"""
+UPDATE PATHS BEFORE RUNNING THE CODE
+video_path = path to the video to process
+model_path = path to Mediapipe pose landmarker model file
+"""
+video_path = "30vids/SC-MSW_0019_B_1_1_SOLO.mp4.mp4" 
 model_path = "C:/Users/laura/Documents/DSSF/DCDS-AI-to-Avatar/pose_landmarker_full.task"
 csv_path   = f"C:/Users/laura/Documents/DSSF/DCDS-AI-to-Avatar/{os.path.splitext(os.path.basename(video_path))[0]}_landmarks.csv"
 
@@ -27,7 +36,7 @@ vid_capture = cv2.VideoCapture(video_path)
 if not vid_capture.isOpened():
     print(f"ERROR: Could not open {video_path}"); exit()
 
-# csv
+# landmark names for joints
 landmark_names = [
     "NOSE","LEFT_EYE_INNER","LEFT_EYE","LEFT_EYE_OUTER",
     "RIGHT_EYE_INNER","RIGHT_EYE","RIGHT_EYE_OUTER",
@@ -56,13 +65,13 @@ with open(csv_path, 'w', newline='') as f:
         if results.pose_landmarks:
             lm = results.pose_landmarks[0] # landmarks
 
-            # save to csv
+            # save to csv (joints that were not in frame are stored as)
             row = [timestamp_ms]
             for l in lm:
                 row.extend([l.x, l.y, l.z] if l.visibility > 0.5 else [None, None, None]) # body parts not visible in video
             writer.writerow(row)
 
-            # draw dots and lines if visible in video
+            # graph joints and skeleton on video previews (check how professor moves)
             for l in lm:
                 if l.visibility > 0.5:
                     cv2.circle(curr_frame, (int(l.x*w), int(l.y*h)), 5, (0,255,0), -1)

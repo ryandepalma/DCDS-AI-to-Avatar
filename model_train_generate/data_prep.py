@@ -1,10 +1,19 @@
+"""
+Laura Ozoria
+Load landmark csvs, extracts right arm joints, normalizes, 
+augments, and splits the data into sets for training and validation.
+
+DON'T RUN THIS CODE -> RUN THROUGH TRAIN.PY
+"""
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import joblib
 import os
 
-# combine csv files
+"""
+UPDATE TO THE FOLDER/PATH THAT CONTAINS YOUR PROCESSED LANDMARK CSV
+"""
 landmarks_folder = "video_data"  
 all_sequences = []
 
@@ -14,7 +23,7 @@ for csv_file in csv_files:
     print(f"processing: {csv_file}")
     pose_data = pd.read_csv(os.path.join(landmarks_folder, csv_file))
 
-    # right arm joints
+    # ONLY right arm joints -> can be change to different body parts
     right_arm_cols = [col for col in pose_data.columns if any(
         joint in col for joint in ['RIGHT_SHOULDER', 'RIGHT_ELBOW', 'RIGHT_WRIST',
                                     'RIGHT_PINKY', 'RIGHT_INDEX', 'RIGHT_THUMB'])]
@@ -27,25 +36,26 @@ for csv_file in csv_files:
         all_sequences.append(values[i : i + 30])
 
 sequences = np.array(all_sequences)
-print(f"Total sequences from all videos: {sequences.shape}")
 
 # normalize video size to have comparable data through all of them 
 scaler = MinMaxScaler()
 seq_flat = sequences.reshape(-1, sequences.shape[2])  # flatten to normalize
 seq_flat = scaler.fit_transform(seq_flat)            
-sequences = seq_flat.reshape(sequences.shape)         # reshape back
+sequences = seq_flat.reshape(sequences.shape) # reshape back
 
+# save scaler so generate.py can convert output to real coordinates
 joblib.dump(scaler, "scaler.pkl")
-print("Scaler saved.")
+print("scaler saved.")
 
 def augment_sequences(sequences):
     """
-    Doubles the dataset by creating two variations of each sequence
-    with different speeds and slight move variations.
-
-    Not ncessary with bigger data sets.
-    """
+    Doubles the dataset by creating two variations of each sequence.
+    - Noise: simulates variation between different people
+    - Speed: simulates faster movements to increase data points
     
+    NOT NECESSERY WITH LARGER DATASESTS
+    """
+
     augmented = []
     for seq in sequences:
         # simulate natural variation between people
@@ -61,9 +71,7 @@ def augment_sequences(sequences):
 
 sequences = np.concatenate([sequences, augment_sequences(sequences)])
 
-# trainining split
+# trainining split 
 split = int(len(sequences) * 0.8)
 train_sequences = sequences[:split]
 val_sequences   = sequences[split:]
-
-print(f"train: {train_sequences.shape} | val: {val_sequences.shape}")

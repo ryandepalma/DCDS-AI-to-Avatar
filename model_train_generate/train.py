@@ -1,3 +1,11 @@
+"""
+Laura Ozoria
+Train autoencoder on prepared movement sequences.
+saves best model to best_model.pth
+
+RUN TO TRAIN A NEW MODEL.
+"""
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -67,5 +75,4 @@ for epoch in range(EPOCHS):
     else:
         patience_counter += 1
         if patience_counter >= PATIENCE:
-            print(f"early stopping at epoch {epoch+1} | no improvement for {PATIENCE} epochs")
-            break  # exits the epoch loop
+            break
